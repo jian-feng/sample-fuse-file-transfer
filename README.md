@@ -1,6 +1,15 @@
 # sample-fuse-file-transfer
 Demonstrate how to use JBoss Fuse as file transfer hub
 
+HIGHLIGHTS
+- Integration triggered by trigger file on remote SFTP Server
+- Transfer multiple files then create a new trigger file to notify target system that data file are ready
+- Using camel-sftp and and local work dir to avoid overhead for big size file
+- Using JBoss Fuse BOM in pom.xml, so that easy to migrate new version of fuse
+- Divided customer configuration in perperties.xml, so that easy to modify
+- Separate definition portion of Endpoint in CamelRoute.xml, so that simplified route definition part
+
+
 ## INTEGRATION OVERVIEW
 
 ![integration overview diagram](./doc/pic/integration-overview.jpg)
@@ -24,12 +33,6 @@ Demonstrate how to use JBoss Fuse as file transfer hub
       Strategy class for aggregate multiple data file processing against single trigger file.  
    - *TriggerValidationProcessor.java*
       Processor class to implement business logic like validation the content of trigger file.
-
-## IMPLEMENT HIGHLIGHT
-
-- Using JBoss Fuse BOM in pom.xml, so that easy to migrate new version of fuse
-- Divided customer configuration in perperties.xml, so that easy to modify
-- Separate definition portion of Endpoint in CamelRoute.xml, so that simplified route definition part
 
 
 ## HOW TO RUN
