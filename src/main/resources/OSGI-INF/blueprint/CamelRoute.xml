@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0
+       http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint
+       http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
+       http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
+
+	<camelContext id="sample-fuse-file-transfer" trace="true"
+		xmlns="http://camel.apache.org/schema/blueprint">
+
+		<!-- Polling Trigger File (FTP Consumer Endpoint) -->
+		<endpoint id="FtpPollingEndpoint"
+			uri="sftp://{{FtpPollingEndpoint.username}}@{{FtpPollingEndpoint.hostname}}:{{FtpPollingEndpoint.port}}/{{FtpPollingEndpoint.directory}}">
+			<property key="password" value="{{FtpPollingEndpoint.password}}" />
+			<property key="privateKeyFile" value="{{FtpPollingEndpoint.privateKeyFile}}" />
+			<property key="delay" value="{{FtpPollingEndpoint.delay}}" />
+			<property key="charset" value="UTF-8" />
+			<property key="delete" value="true" />
+			<property key="disconnect" value="true" />
+			<property key="throwExceptionOnConnectFailed" value="true" />
+		</endpoint>
+
+		<!-- Get remote data files (SFTP Consumer Endpoint) -->
+		<endpoint id="SftpGetEndpoint"
+			uri="sftp://{{SftpGetEndpoint.username}}@{{SftpGetEndpoint.hostname}}:{{SftpGetEndpoint.port}}/{{SftpGetEndpoint.directory}}">
+			<property key="password" value="{{SftpGetEndpoint.password}}" />
+			<property key="privateKeyFile" value="{{SftpGetEndpoint.privateKeyFile}}" />
+			<property key="delay" value="{{SftpGetEndpoint.delay}}" />
+			<property key="localWorkDirectory" value="{{SftpGetEndpoint.local_work_dir}}" />
+			<property key="include" value="{{SftpGetEndpoint.fileNameInclude}}" />
+			<property key="streamDownload" value="true" />
+			<property key="binary" value="true" />
+			<property key="stepwise" value="false" />
+			<property key="move" value=".done" />
+			<property key="moveFailed" value=".error" />
+			<property key="disconnect" value="true" />
+			<property key="throwExceptionOnConnectFailed" value="true" />
+		</endpoint>
+
+		<!-- Transfer data to remote sftp server (File Producer Endpoint ) -->
+		<endpoint id="FileOutputEndpoint" 
+			uri="sftp://{{FileOutputEndpoint.username}}@{{FileOutputEndpoint.hostname}}:{{FileOutputEndpoint.port}}/{{FileOutputEndpoint.directory}}">
+			<property key="password" value="{{NewTriggerEndpoint.password}}" />
+			<property key="privateKeyFile" value="{{NewTriggerEndpoint.privateKeyFile}}" />
+			<property key="fileName" value="{{FileOutputEndpoint.fileName}}" />
+			<property key="charset" value="UTF-8" />
+			<property key="stepwise" value="false" />
+			<property key="disconnect" value="true" />
+			<property key="throwExceptionOnConnectFailed" value="true" />
+		</endpoint>
+
+		<!-- Create new trigger File on remote sftp server (File Producer Endpoint) -->
+		<endpoint id="NewTriggerEndpoint"
+			uri="sftp://{{NewTriggerEndpoint.username}}@{{NewTriggerEndpoint.hostname}}:{{NewTriggerEndpoint.port}}/{{NewTriggerEndpoint.directory}}">
+			<property key="password" value="{{NewTriggerEndpoint.password}}" />
+			<property key="privateKeyFile" value="{{NewTriggerEndpoint.privateKeyFile}}" />
+			<property key="fileName" value="{{NewTriggerEndpoint.fileName}}" />
+			<property key="stepwise" value="false" />
+			<property key="disconnect" value="true" />
+			<property key="throwExceptionOnConnectFailed" value="true" />
+		</endpoint>
+
+		<route id="Trigger" autoStartup="true">
+			<from ref="FtpPollingEndpoint" />
+			<process ref="TriggerValidationProcessor" />
+			<to uri="controlbus:route?routeId=TransferFile&amp;action=start" />
+			<delay>
+				<constant>5000</constant>
+				<to uri="controlbus:route?routeId=TransferFile&amp;action=stop" />
+			</delay>
+		</route>
+
+		<route id="TransferFile" autoStartup="false"
+			shutdownRunningTask="CompleteAllTasks">
+			<from ref="SftpGetEndpoint" />
+			<to ref="FileOutputEndpoint" />
+			<aggregate strategyRef="myAggregate"
+				completionFromBatchConsumer="true">
+				<correlationExpression>
+					<constant>true</constant>
+				</correlationExpression>
+				<completionTimeout>
+					<simple>3600000</simple>
+				</completionTimeout>
+				<completionSize>
+					<exchangeProperty>CamelBatchSize</exchangeProperty>
+				</completionSize>
+				<setBody>
+					<simple>${date:now:yyyyMMdd}</simple>
+				</setBody>
+				<to ref="NewTriggerEndpoint" />
+			</aggregate>
+		</route>
+
+	</camelContext>
+
+</blueprint>

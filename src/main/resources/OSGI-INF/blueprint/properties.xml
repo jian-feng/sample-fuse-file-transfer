@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.0.0.xsd
+       ">
+
+	<!-- Property File -->
+	<cm:property-placeholder id="sample1.placeholder"
+		persistent-id="sample1">
+		<cm:default-properties>
+			<!-- Property for FtpPollingEndpoint -->
+			<cm:property name="FtpPollingEndpoint.hostname" value="localhost" />
+			<cm:property name="FtpPollingEndpoint.port" value="22" />
+			<cm:property name="FtpPollingEndpoint.username" value="test" />
+			<cm:property name="FtpPollingEndpoint.password" value="test" />
+			<cm:property name="FtpPollingEndpoint.privateKeyFile"
+				value="~/.ssh/id_rsa" />
+			<cm:property name="FtpPollingEndpoint.directory" value="inDir/trigger" />
+			<cm:property name="FtpPollingEndpoint.fileName" value="test.trg" />
+			<cm:property name="FtpPollingEndpoint.delay" value="10000" />
+			<cm:property name="FtpPollingEndpoint.move" value=".done" />
+			<cm:property name="FtpPollingEndpoint.moveFailed" value=".error" />
+			<cm:property name="FtpPollingEndpoint.local_work_dir"
+				value="work_dir" />
+
+			<!-- Property for SftpGetEndpoint -->
+			<cm:property name="SftpGetEndpoint.hostname" value="localhost" />
+			<cm:property name="SftpGetEndpoint.port" value="22" />
+			<cm:property name="SftpGetEndpoint.username" value="test" />
+			<cm:property name="SftpGetEndpoint.password" value="test" />
+			<cm:property name="SftpGetEndpoint.privateKeyFile" value="~/.ssh/id_rsa" />
+			<cm:property name="SftpGetEndpoint.delay" value="10000" />
+			<cm:property name="SftpGetEndpoint.directory" value="inDir/data" />
+			<cm:property name="SftpGetEndpoint.fileNameInclude"
+				value=".*.dat" />
+			<cm:property name="SftpGetEndpoint.local_work_dir" value="workDir" />
+
+			<!-- Property for FileOutputEndpoint -->
+			<cm:property name="FileOutputEndpoint.hostname" value="localhost" />
+			<cm:property name="FileOutputEndpoint.port" value="22" />
+			<cm:property name="FileOutputEndpoint.username" value="test" />
+			<cm:property name="FileOutputEndpoint.password" value="test" />
+			<cm:property name="FileOutputEndpoint.privateKeyFile"
+				value="~/.ssh/id_rsa" />
+			<cm:property name="FileOutputEndpoint.directory" value="outDir/transferedData" />
+			<cm:property name="FileOutputEndpoint.fileName"
+				value="${header.CamelFileNameOnly}.${date:now:yyyyMMdd-HHmmss.SSS}" />
+
+			<!-- Property for NewTriggerEndpoint -->
+			<cm:property name="NewTriggerEndpoint.hostname" value="localhost" />
+			<cm:property name="NewTriggerEndpoint.port" value="22" />
+			<cm:property name="NewTriggerEndpoint.username" value="test" />
+			<cm:property name="NewTriggerEndpoint.password" value="test" />
+			<cm:property name="NewTriggerEndpoint.privateKeyFile"
+				value="~/.ssh/id_rsa" />
+			<cm:property name="NewTriggerEndpoint.directory" value="outDir/newTrigger" />
+			<cm:property name="NewTriggerEndpoint.fileName"
+				value="newTrigger-${date:now:yyyyMMdd-HHmmss.SSS}.trg" />
+
+		</cm:default-properties>
+	</cm:property-placeholder>
+
+</blueprint>
