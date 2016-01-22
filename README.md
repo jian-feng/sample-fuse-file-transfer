@@ -1,6 +1,8 @@
 # sample-fuse-file-transfer
 Demonstrate how to use JBoss Fuse as file transfer hub
 
+For fuse beginner, there is also a [fully packaged DEMO](https://github.com/jian-feng/fuse-file-transfer-hub-demo).
+
 HIGHLIGHTS
 - Integration triggered by trigger file on remote SFTP Server
 - Transfer multiple files then create a new trigger file to notify target system that data file are ready
